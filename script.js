@@ -2,15 +2,15 @@ const WIDTH = 1400
 const HEIGHT = 800
 const PARTICLE_SIZE = 8
 const PARTICLE_CHANGE_SIZE_SPD = 0.1
-const PARTICLE_CHANGE_SPD = 0.3
-const ACCELERATION = .1
+const PARTICLE_CHANGE_SPD = 0.5
+const ACCELERATION = .15
 
 // dot parameter
 const DOT_CHANGE_SIZE_SPD = .05
 const DOT_CHANGE_ALP_SPD = .05
 
 // toc do ban it nhat
-const PARTICAL_MIN_SPD = 10
+const PARTICAL_MIN_SPD = 14
 
 // amount of particle in 1 bullet
 NUMBER_PARTICAL_PER_BULLET = 25
@@ -71,13 +71,26 @@ class particle {
     this.dots.forEach(dot => {
       dot.size -= DOT_CHANGE_SIZE_SPD
       dot.alpha -= DOT_CHANGE_ALP_SPD
-    }) 
+    })
 
+    // sửa lỗi dot < 0
+    this.dots = this.dots.filter(dot => {
+      return dot.size > 0
+    })
+
+    // xóa bỏ 1 hạt khi nó hết thuốc
+    if (this.dots.length == 0) {
+      this.remove()
+    }
+  }
+  remove() {
+    // indexOf (this) ý nói hạt hiện tại trong mảng
+    this.bullet.particles.splice(this.bullet.particles.indexOf(this), 1)
   }
   draw() {
     // ve them hat cho dep
     this.dots.forEach(dot => {
-      this.ctx.fillStyle = 'rgba('+this.color+','+dot.alpha+' )'
+      this.ctx.fillStyle = 'rgba(' + this.color + ',' + dot.alpha + ' )'
       this.ctx.beginPath()
       this.ctx.arc(dot.x, dot.y, dot.size, 0, 2 * Math.PI)
       this.ctx.fill()
@@ -95,8 +108,8 @@ class bullet {
   constructor(fireworks) {
     this.fireworks = fireworks
     this.ctx = fireworks.ctx
-    this.x = 300
-    this.y = 300
+    this.x = Math.random() * WIDTH
+    this.y = Math.random() * HEIGHT / 2
     this.color = Math.floor(Math.random() * 255) + ',' +
       Math.floor(Math.random() * 255) + ',' +
       Math.floor(Math.random() * 255)
@@ -115,10 +128,16 @@ class bullet {
     // this.particles.push(newParticle)
   }
   update() {
+    if (this.particles.length == 0) {
+      this.remove()
+    }
     this.particles.forEach(particle => particle.update())
   }
   draw() {
     this.particles.forEach(particle => particle.draw())
+  }
+  remove() {
+    this.fireworks.bullets.splice(this.fireworks.bullets.indexOf(this), 1)
   }
 }
 
@@ -132,9 +151,16 @@ class fireworks {
     document.body.appendChild(this.canvas)
 
     this.bullets = []
+
+    // tao ra nhieu qua bullet 
+    setInterval(() => {
+      let newBullet = new bullet(this)
+      this.bullets.push(newBullet)
+    }, 1500)
+
     // create new bullet
-    let newBullet = new bullet(this)
-    this.bullets.push(newBullet)
+    // let newBullet = new bullet(this)
+    // this.bullets.push(newBullet)
 
     this.loop()
   }
