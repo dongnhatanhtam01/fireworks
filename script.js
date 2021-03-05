@@ -47,7 +47,7 @@ class particle {
 
     // tao random do lon cua dai luong speedX va speedY
     this.speedX = this.speed * Math.cos(this.deg)
-    this.speedY = this.speed * Math.sin(this.deg) - this.fallSpeed
+    this.speedY = this.speed * Math.sin(this.deg) +  this.fallSpeed
     // calculate position
     this.x += this.speedX
     this.y += this.speedY
